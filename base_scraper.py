@@ -92,6 +92,14 @@ class BaseScraper:
         if wait_condition:
             WebDriverWait(self.driver, wait_time).until(wait_condition)
         return self.driver.page_source
+    
+    def fetch_with_selenium_return_cookies(self, url, wait_time=10, wait_condition=None):
+        if not self.driver:
+            self.setup_selenium_driver()
+        self.driver.get(url)
+        if wait_condition:
+            WebDriverWait(self.driver, wait_time).until(wait_condition)
+        return self.driver.page_source, self.driver.get_cookies()
 
     def scraper(self):
         raise NotImplementedError("Scrape method must be implemented by the subclass.")
