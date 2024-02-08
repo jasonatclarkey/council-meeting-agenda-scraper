@@ -1,9 +1,10 @@
+import argparse, sys
 import os.path
 import importlib
 from pathlib import Path
 import logging
 from logging.config import dictConfig
-from functions import download_pdf, read_pdf, parse_pdf, write_email, send_email
+from functions import download_pdf, is_in_councils_args, read_pdf, parse_pdf, write_email, send_email
 import database as db
 from _dataclasses import Council
 from base_scraper import scraper_registry
@@ -31,6 +32,12 @@ def dynamic_import_scrapers():
             ""
         )  # Remove the .py suffix
         module_name = ".".join(module_path.parts)
+
+        # Check council is wanted
+        if args.councils is not None and not is_in_councils_args(path.name, args.councils):
+            logging.info(f"Skipping {module_name}")
+            continue
+
         logging.info(f"Loading {module_name}")
         # Import the module
         importlib.import_module(module_name)
@@ -111,6 +118,11 @@ def main():
 if __name__ == "__main__":
     setup_logging(level="INFO")
     logging.getLogger().name = "YIMBY-Scraper"
+
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--councils", help="CSV List of councils: --councils=monash,bayside_nsw")
+    args=parser.parse_args()
+    logging.debug(f"Command Line: {sys.argv}\ncouncils: {args.councils}")
     logging.info("YIMBY SCRAPER Start")
     dynamic_import_scrapers()
     main()

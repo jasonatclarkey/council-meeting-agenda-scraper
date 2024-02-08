@@ -87,3 +87,12 @@ def send_email(to, subject, body):
         print(
             f"Email functionality is disabled. Would have sent email to {to} with subject {subject} and body {body}."
         )
+
+def is_in_councils_args(council, list_of_councils):
+    if list_of_councils is None: # This should not trigger
+        return False
+    councils = list_of_councils.split(',')
+    for c in councils:
+        if c in council:
+            return True
+    return False
